@@ -191,6 +191,7 @@
       flex-shrink: 0;
     }
 
+    /* ── BADGES DOS TIPOS ── */
     .badge {
       font-size: 11px;
       text-transform: uppercase;
@@ -201,6 +202,16 @@
       color: var(--accent);
       border: 1px solid rgba(212, 175, 55, 0.3);
     }
+    .badge[data-tipo="personagem"] { background: rgba(212, 175, 55, 0.12); color: #d4af37; border-color: rgba(212, 175, 55, 0.3); }
+    .badge[data-tipo="local"]      { background: rgba(96, 165, 250, 0.12); color: #60a5fa; border-color: rgba(96, 165, 250, 0.3); }
+    .badge[data-tipo="item"]       { background: rgba(74, 222, 128, 0.12); color: #4ade80; border-color: rgba(74, 222, 128, 0.3); }
+    .badge[data-tipo="chefe"]      { background: rgba(248, 113, 113, 0.12); color: #f87171; border-color: rgba(248, 113, 113, 0.3); }
+    .badge[data-tipo="cancao"]     { background: rgba(192, 132, 252, 0.12); color: #c084fc; border-color: rgba(192, 132, 252, 0.3); }
+    .badge[data-tipo="raca"]       { background: rgba(34, 211, 238, 0.12); color: #22d3ee; border-color: rgba(34, 211, 238, 0.3); }
+    .badge[data-tipo="mini-chefe"] { background: rgba(251, 146, 60, 0.12); color: #fb923c; border-color: rgba(251, 146, 60, 0.3); }
+    .badge[data-tipo="inimigo"]    { background: rgba(156, 163, 175, 0.12); color: #9ca3af; border-color: rgba(156, 163, 175, 0.3); }
+    .badge[data-tipo="divindade"]  { background: rgba(250, 240, 180, 0.12); color: #faf0b4; border-color: rgba(250, 240, 180, 0.3); }
+    .badge[data-tipo="mecanica"]   { background: rgba(52, 211, 153, 0.12); color: #34d399; border-color: rgba(52, 211, 153, 0.3); }
 
     .score {
       font-size: 12px;
@@ -213,6 +224,19 @@
       font-size: 14px;
       line-height: 1.55;
       opacity: 0.85;
+    }
+
+    /* ── CAIXA DOS COMANDOS DO N64 ── */
+    .comandos-box {
+      margin-top: 14px;
+      padding: 10px 14px;
+      background: rgba(212, 175, 55, 0.08);
+      border-left: 4px solid var(--accent);
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 14px;
+      color: var(--accent);
+      letter-spacing: 1px;
     }
 
     mark {
@@ -258,7 +282,7 @@
       <input
         id="query"
         type="text"
-        placeholder="Quem viaja no tempo? Onde fica o Templo do Fogo?"
+        placeholder="Quem viaja no tempo? Como tocar a Canção do Tempo?"
         autocomplete="off"
         autofocus
       />
@@ -266,11 +290,11 @@
     </form>
 
     <div class="suggestions" id="suggestions">
+      <span class="chip">Link</span>
       <span class="chip">Ganondorf</span>
       <span class="chip">Templo do Fogo</span>
-      <span class="chip">Ocarina do Tempo</span>
-      <span class="chip">Sábios</span>
-      <span class="chip">Epona</span>
+      <span class="chip">Canção do Tempo</span>
+      <span class="chip">Espada Mestra</span>
       <span class="chip">Chefes</span>
     </div>
 
@@ -278,7 +302,7 @@
     <div id="results"></div>
 
     <footer>
-      Dados extraídos de The Legend of Zelda: Ocarina of Time · 43 registros
+      Dados extraídos de The Legend of Zelda: Ocarina of Time · 196 registros
     </footer>
   </div>
 
@@ -289,6 +313,7 @@
     const status = document.getElementById("status");
     const results = document.getElementById("results");
 
+    // Preenche a busca ao clicar nas sugestões
     document.querySelectorAll(".chip").forEach(chip => {
       chip.addEventListener("click", () => {
         input.value = chip.textContent;
@@ -296,12 +321,14 @@
       });
     });
 
+    // Função para evitar HTML injection
     function escapeHtml(s) {
       return String(s)
         .replace(/&/g, "&amp;").replace(/</g, "&lt;")
         .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
     }
 
+    // Função para grifar as palavras pesquisadas no texto
     function highlight(text, query) {
       const words = query.trim().split(/\s+/)
         .filter(w => w.length > 2)
@@ -311,9 +338,11 @@
       return escapeHtml(text).replace(re, "<mark>$1</mark>");
     }
 
+    // Lógica do Submit da Busca
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
       const q = input.value.trim();
+      
       if (q.length < 2) {
         status.textContent = "Digite pelo menos 2 caracteres.";
         status.className = "error";
@@ -326,7 +355,8 @@
       results.innerHTML = "";
 
       try {
-        const r = await fetch(`/api/search?query=${encodeURIComponent(q)}&limit=10`);
+        // Chama a API
+        const r = await fetch(`/api/search?query=${encodeURIComponent(q)}&limit=20`);
         const data = await r.json();
 
         if (!r.ok || data.status !== "ok") {
@@ -348,18 +378,24 @@
           return;
         }
 
+        // Renderiza os Cards
         results.innerHTML = data.results.map((r, i) => `
           <article class="card" style="animation-delay: ${i * 40}ms">
             <div class="card-header">
               <div class="card-title">${escapeHtml(r.payload.titulo || "—")}</div>
               <div class="card-meta">
-                <span class="badge">${escapeHtml(r.payload.tipo || "?")}</span>
+                <span class="badge" data-tipo="${escapeHtml(r.payload.tipo || "")}">${escapeHtml(r.payload.tipo || "?")}</span>
                 <span class="score">${r.score.toFixed(4)}</span>
               </div>
             </div>
             <p class="card-text">${highlight(r.payload.text || "", q)}</p>
+            
+            <!-- Exibe os comandos do N64 caso a canção tenha -->
+            ${r.payload.comandos ? `<div class="comandos-box">🎵 ${escapeHtml(r.payload.comandos)}</div>` : ""}
+            
           </article>
         `).join("");
+        
       } catch (err) {
         status.textContent = "Erro: " + err.message;
         status.className = "error";
