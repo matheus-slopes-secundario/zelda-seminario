@@ -13,12 +13,12 @@
   <style>
     :root {
       --bg-deep: #060a12;
-      --bg-hyrule: #0d1726;
       --gold: #d4af37;
       --gold-light: #f5e28a;
       --gold-glow: rgba(212, 175, 55, 0.4);
-      --grass: #1b3b22;
-      --grass-light: #2f5e38;
+      --grass-base: #1b3b22;
+      --grass-mid: #2f5e38;
+      --grass-light: #4a8f5a;
       --text-main: #f0f4f8;
       --text-muted: #8b9bb4;
       --card-bg: rgba(13, 23, 38, 0.85);
@@ -38,93 +38,97 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 60px 20px 120px; /* Espaço extra no fundo para a grama */
+      padding: 0 20px 120px; /* Espaço extra para a grama no fundo */
       position: relative;
       overflow-x: hidden;
     }
 
-    /* ── GRAMA NOS CANTOS INFERIORES ── */
-    .grass-corner {
-      position: fixed;
-      bottom: 0;
-      width: 350px;
-      height: 250px;
-      pointer-events: none;
-      z-index: 0;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 500 250'%3E%3Cpath d='M0,250 C50,200 100,220 150,180 C200,240 250,200 300,230 C350,190 400,210 450,170 L500,250 Z' fill='%230d1726' opacity='0.6'/%3E%3Cpath d='M0,250 C30,210 80,230 120,190 C160,240 200,210 250,240 C300,210 350,230 400,180 L450,250 Z' fill='%231b3b22' opacity='0.8'/%3E%3Cpath d='M-10,260 C20,220 60,240 90,200 C130,250 170,220 220,250 C270,230 310,250 350,210 L380,260 Z' fill='%232f5e38'/%3E%3C/svg%3E");
-      background-size: cover;
-      background-position: bottom left;
-      filter: drop-shadow(0 -5px 15px rgba(0,0,0,0.8));
-    }
-    .grass-left { left: -50px; transform: scaleX(-1); }
-    .grass-right { right: -50px; }
-
-    .container {
+    /* ── CABEÇALHO COM A CAPA DO JOGO ── */
+    header {
       width: 100%;
       max-width: 900px;
+      height: 320px;
+      margin: 30px auto 20px;
+      border-radius: 16px;
+      background-image: 
+        linear-gradient(to bottom, rgba(6, 10, 18, 0.4) 0%, rgba(6, 10, 18, 0.9) 100%),
+        url('https://upload.wikimedia.org/wikipedia/en/5/57/The_Legend_of_Zelda_Ocarina_of_Time.jpg');
+      background-size: cover;
+      background-position: center 30%;
+      border: 1px solid var(--border-gold);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.8), inset 0 0 50px rgba(0,0,0,0.6);
       position: relative;
-      z-index: 1;
-    }
-
-    /* ── HEADER & LOGO ── */
-    header {
-      text-align: center;
-      margin-bottom: 50px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: center;
+      padding-bottom: 20px;
+      overflow: hidden;
       animation: float 6s ease-in-out infinite;
     }
 
     @keyframes float {
       0% { transform: translateY(0px); }
-      50% { transform: translateY(-8px); }
+      50% { transform: translateY(-5px); }
       100% { transform: translateY(0px); }
     }
 
-    /* Triforce em CSS Puro */
+    /* Triforce em CSS Puro (sobreposta à capa) */
     .triforce-container {
       display: flex;
       flex-direction: column;
       align-items: center;
-      margin-bottom: 15px;
-      filter: drop-shadow(0 0 20px var(--gold-glow));
+      margin-bottom: 10px;
+      filter: drop-shadow(0 0 15px var(--gold-glow));
     }
-    .tri-row { display: flex; gap: 4px; }
+    .tri-row { display: flex; gap: 3px; }
     .tri {
       width: 0; height: 0;
-      border-left: 20px solid transparent;
-      border-right: 20px solid transparent;
-      border-bottom: 34px solid var(--gold);
+      border-left: 15px solid transparent;
+      border-right: 15px solid transparent;
+      border-bottom: 26px solid var(--gold);
       position: relative;
     }
     .tri::after {
       content: '';
       position: absolute;
-      top: 6px; left: -16px;
+      top: 5px; left: -12px;
       width: 0; height: 0;
-      border-left: 16px solid transparent;
-      border-right: 16px solid transparent;
-      border-bottom: 28px solid var(--bg-deep);
+      border-left: 12px solid transparent;
+      border-right: 12px solid transparent;
+      border-bottom: 21px solid var(--bg-deep);
     }
 
     h1 {
       font-family: 'Cinzel', serif;
-      font-size: 38px;
+      font-size: 32px;
       font-weight: 800;
-      letter-spacing: 4px;
+      letter-spacing: 3px;
       text-transform: uppercase;
       background: linear-gradient(to bottom, var(--gold-light) 0%, var(--gold) 50%, #9e7b21 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
-      margin-bottom: 8px;
-      text-shadow: 0 4px 15px rgba(0,0,0,0.8);
+      margin-bottom: 4px;
+      text-shadow: 0 4px 15px rgba(0,0,0,0.9);
+      text-align: center;
     }
 
     .subtitle {
       font-family: 'Cinzel', serif;
       color: var(--text-muted);
-      font-size: 14px;
+      font-size: 13px;
       letter-spacing: 2px;
       text-transform: uppercase;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+    }
+
+    /* ── CONTAINER PRINCIPAL ── */
+    .container {
+      width: 100%;
+      max-width: 900px;
+      position: relative;
+      z-index: 1;
     }
 
     /* ── BARRA DE BUSCA ── */
@@ -287,7 +291,6 @@
 
     .card-meta { display: flex; gap: 10px; align-items: center; flex-shrink: 0; }
 
-    /* Badges redesenhados */
     .badge {
       font-family: 'Cinzel', serif;
       font-size: 11px;
@@ -378,24 +381,99 @@
       letter-spacing: 2px;
     }
 
+    /* ── GRAMA ANIMADA NA BASE DA TELA ── */
+    .grass-field {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 90px;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-around;
+      padding: 0 10px;
+    }
+
+    .blade {
+      width: 12px;
+      height: 60px;
+      background: linear-gradient(to top, var(--grass-base), var(--grass-mid));
+      border-radius: 50% 50% 0 0;
+      transform-origin: bottom center;
+      animation: sway 3s ease-in-out infinite alternate;
+      box-shadow: inset 0 0 5px rgba(0,0,0,0.5);
+      position: relative;
+    }
+
+    .blade:nth-child(odd) {
+      height: 80px;
+      background: linear-gradient(to top, var(--grass-mid), var(--grass-light));
+      animation-duration: 4s;
+    }
+
+    .blade:nth-child(3n) {
+      height: 50px;
+      background: linear-gradient(to top, var(--grass-base), var(--grass-light));
+      animation-duration: 5s;
+      animation-delay: -1s;
+    }
+
+    .blade:nth-child(4n) {
+      height: 70px;
+      animation-duration: 3.5s;
+      animation-delay: -2s;
+    }
+
+    @keyframes sway {
+      0% { transform: rotate(-5deg) skewX(-2deg); }
+      100% { transform: rotate(8deg) skewX(3deg); }
+    }
+
+    /* ── RESPONSIVIDADE ── */
     @media (max-width: 600px) {
-      h1 { font-size: 28px; }
+      header { height: 220px; }
+      h1 { font-size: 24px; }
       .search-box { flex-direction: column; }
       #searchBtn { padding: 16px; }
       .card-header { flex-direction: column; align-items: flex-start; }
-      .grass-corner { width: 200px; height: 150px; }
+      .grass-field { height: 60px; }
+      .blade { width: 8px; height: 40px; }
+      .blade:nth-child(odd) { height: 50px; }
     }
   </style>
 </head>
 <body>
 
-  <!-- Decoração da Grama (SVG embutido no CSS) -->
-  <div class="grass-corner grass-left"></div>
-  <div class="grass-corner grass-right"></div>
+  <!-- Grama Animada Fixa na Base -->
+  <div class="grass-field">
+    <div class="blade"></div>
+    <div class="blade"></div>
+    <div class="blade"></div>
+    <div class="blade"></div>
+    <div class="blade"></div>
+    <div class="blade"></div>
+    <div class="blade"></div>
+    <div class="blade"></div>
+    <div class="blade"></div>
+    <div class="blade"></div>
+    <div class="blade"></div>
+    <div class="blade"></div>
+    <div class="blade"></div>
+    <div class="blade"></div>
+    <div class="blade"></div>
+    <div class="blade"></div>
+    <div class="blade"></div>
+    <div class="blade"></div>
+    <div class="blade"></div>
+    <div class="blade"></div>
+  </div>
 
   <div class="container">
+    <!-- Capa com a Arte do Jogo -->
     <header>
-      <!-- Triforce em CSS Puro -->
       <div class="triforce-container">
         <div class="tri-row">
           <div class="tri"></div>
@@ -405,7 +483,6 @@
           <div class="tri"></div>
         </div>
       </div>
-      
       <h1>Ocarina of Time</h1>
       <p class="subtitle">Oráculo de Hyrule · Busca Híbrida</p>
     </header>
