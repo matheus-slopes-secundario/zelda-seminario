@@ -3,286 +3,418 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Ocarina of Time — Busca Semântica</title>
+  <title>Ocarina of Time — Oráculo de Hyrule</title>
+  
+  <!-- Fontes Temáticas -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Merriweather:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+
   <style>
     :root {
-      --bg: #0a0e1a;
-      --bg-card: #141a2e;
-      --bg-card-hover: #1a2138;
-      --accent: #d4af37;
-      --accent-dim: #8a7028;
-      --text: #e8e8f0;
-      --text-dim: #8b8fa8;
-      --border: #2a3050;
-      --success: #4ade80;
-      --error: #f87171;
+      --bg-deep: #060a12;
+      --bg-hyrule: #0d1726;
+      --gold: #d4af37;
+      --gold-light: #f5e28a;
+      --gold-glow: rgba(212, 175, 55, 0.4);
+      --grass: #1b3b22;
+      --grass-light: #2f5e38;
+      --text-main: #f0f4f8;
+      --text-muted: #8b9bb4;
+      --card-bg: rgba(13, 23, 38, 0.85);
+      --border-gold: rgba(212, 175, 55, 0.3);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background: var(--bg);
-      color: var(--text);
+      font-family: 'Merriweather', serif;
+      background-color: var(--bg-deep);
+      background-image: 
+        radial-gradient(circle at 50% 0%, #152945 0%, var(--bg-deep) 70%),
+        url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      color: var(--text-main);
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 40px 20px;
-      background-image: radial-gradient(ellipse at top, #1a2440 0%, transparent 60%);
+      padding: 60px 20px 120px; /* Espaço extra no fundo para a grama */
+      position: relative;
+      overflow-x: hidden;
     }
 
-    .container { width: 100%; max-width: 860px; }
+    /* ── GRAMA NOS CANTOS INFERIORES ── */
+    .grass-corner {
+      position: fixed;
+      bottom: 0;
+      width: 350px;
+      height: 250px;
+      pointer-events: none;
+      z-index: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 500 250'%3E%3Cpath d='M0,250 C50,200 100,220 150,180 C200,240 250,200 300,230 C350,190 400,210 450,170 L500,250 Z' fill='%230d1726' opacity='0.6'/%3E%3Cpath d='M0,250 C30,210 80,230 120,190 C160,240 200,210 250,240 C300,210 350,230 400,180 L450,250 Z' fill='%231b3b22' opacity='0.8'/%3E%3Cpath d='M-10,260 C20,220 60,240 90,200 C130,250 170,220 220,250 C270,230 310,250 350,210 L380,260 Z' fill='%232f5e38'/%3E%3C/svg%3E");
+      background-size: cover;
+      background-position: bottom left;
+      filter: drop-shadow(0 -5px 15px rgba(0,0,0,0.8));
+    }
+    .grass-left { left: -50px; transform: scaleX(-1); }
+    .grass-right { right: -50px; }
 
+    .container {
+      width: 100%;
+      max-width: 900px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ── HEADER & LOGO ── */
     header {
       text-align: center;
-      margin-bottom: 36px;
+      margin-bottom: 50px;
+      animation: float 6s ease-in-out infinite;
     }
 
-    .triforce {
-      font-size: 42px;
-      margin-bottom: 8px;
-      filter: drop-shadow(0 0 20px rgba(212, 175, 55, 0.5));
+    @keyframes float {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-8px); }
+      100% { transform: translateY(0px); }
+    }
+
+    /* Triforce em CSS Puro */
+    .triforce-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 15px;
+      filter: drop-shadow(0 0 20px var(--gold-glow));
+    }
+    .tri-row { display: flex; gap: 4px; }
+    .tri {
+      width: 0; height: 0;
+      border-left: 20px solid transparent;
+      border-right: 20px solid transparent;
+      border-bottom: 34px solid var(--gold);
+      position: relative;
+    }
+    .tri::after {
+      content: '';
+      position: absolute;
+      top: 6px; left: -16px;
+      width: 0; height: 0;
+      border-left: 16px solid transparent;
+      border-right: 16px solid transparent;
+      border-bottom: 28px solid var(--bg-deep);
     }
 
     h1 {
-      font-size: 28px;
-      font-weight: 700;
-      letter-spacing: 1.5px;
-      background: linear-gradient(135deg, var(--accent), #f5e28a, var(--accent));
+      font-family: 'Cinzel', serif;
+      font-size: 38px;
+      font-weight: 800;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      background: linear-gradient(to bottom, var(--gold-light) 0%, var(--gold) 50%, #9e7b21 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
+      margin-bottom: 8px;
+      text-shadow: 0 4px 15px rgba(0,0,0,0.8);
     }
 
     .subtitle {
-      color: var(--text-dim);
+      font-family: 'Cinzel', serif;
+      color: var(--text-muted);
       font-size: 14px;
-      margin-top: 6px;
-      letter-spacing: 0.5px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
     }
 
+    /* ── BARRA DE BUSCA ── */
     .search-box {
       display: flex;
-      gap: 10px;
-      margin-bottom: 14px;
+      gap: 12px;
+      margin-bottom: 20px;
+      position: relative;
     }
+
+    .search-box::before {
+      content: '';
+      position: absolute;
+      inset: -2px;
+      border-radius: 14px;
+      background: linear-gradient(45deg, var(--gold), transparent, var(--gold));
+      z-index: -1;
+      opacity: 0.3;
+      transition: opacity 0.3s ease;
+    }
+
+    .search-box:focus-within::before { opacity: 0.8; }
 
     #query {
       flex: 1;
-      padding: 16px 20px;
+      padding: 18px 24px;
       font-size: 16px;
-      border: 1px solid var(--border);
+      font-family: 'Merriweather', serif;
+      border: 1px solid var(--border-gold);
       border-radius: 12px;
-      background: var(--bg-card);
-      color: var(--text);
+      background: rgba(6, 10, 18, 0.9);
+      color: var(--text-main);
       outline: none;
-      transition: all 0.2s;
+      transition: all 0.3s;
+      box-shadow: inset 0 0 15px rgba(0,0,0,0.8);
     }
 
-    #query:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15);
-    }
-
-    #query::placeholder { color: var(--text-dim); }
+    #query::placeholder { color: #4a5d7e; font-style: italic; }
+    #query:focus { background: rgba(13, 23, 38, 0.95); border-color: var(--gold); }
 
     #searchBtn {
-      padding: 16px 28px;
+      padding: 0 32px;
+      font-family: 'Cinzel', serif;
       font-size: 16px;
-      font-weight: 600;
-      border: none;
+      font-weight: 700;
+      border: 1px solid var(--gold-light);
       border-radius: 12px;
-      background: linear-gradient(135deg, var(--accent), #b8942c);
-      color: #1a1200;
+      background: linear-gradient(180deg, var(--gold) 0%, #8a7028 100%);
+      color: #0d1726;
       cursor: pointer;
       transition: all 0.2s;
-      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2);
     }
 
     #searchBtn:hover:not(:disabled) {
-      transform: translateY(-1px);
-      box-shadow: 0 8px 20px rgba(212, 175, 55, 0.3);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4);
+      filter: brightness(1.1);
     }
 
-    #searchBtn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
+    #searchBtn:disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(1); }
 
+    /* ── SUGESTÕES ── */
     .suggestions {
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
-      margin-bottom: 30px;
+      gap: 10px;
+      margin-bottom: 40px;
+      justify-content: center;
     }
 
     .chip {
-      padding: 6px 14px;
-      border-radius: 999px;
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      color: var(--text-dim);
+      padding: 6px 16px;
+      border-radius: 20px;
+      background: rgba(212, 175, 55, 0.05);
+      border: 1px solid rgba(212, 175, 55, 0.2);
+      color: var(--text-muted);
       font-size: 13px;
       cursor: pointer;
-      transition: all 0.15s;
+      transition: all 0.2s;
+      font-family: 'Merriweather', serif;
     }
 
     .chip:hover {
-      border-color: var(--accent-dim);
-      color: var(--accent);
-    }
-
-    #status {
-      text-align: center;
-      color: var(--text-dim);
-      font-size: 14px;
-      min-height: 20px;
-      margin-bottom: 20px;
-    }
-
-    #status.error { color: var(--error); }
-    #status.loading { color: var(--accent); }
-
-    #results {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 18px 20px;
-      transition: all 0.2s;
-      animation: fadeIn 0.3s ease-out both;
-    }
-
-    .card:hover {
-      background: var(--bg-card-hover);
-      border-color: var(--accent-dim);
+      background: rgba(212, 175, 55, 0.15);
+      border-color: var(--gold);
+      color: var(--gold-light);
       transform: translateY(-1px);
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(8px); }
+    /* ── STATUS E RESULTADOS ── */
+    #status {
+      text-align: center;
+      font-family: 'Cinzel', serif;
+      color: var(--gold);
+      font-size: 15px;
+      min-height: 24px;
+      margin-bottom: 24px;
+      letter-spacing: 1px;
+      text-shadow: 0 0 10px var(--gold-glow);
+    }
+
+    #status.error { color: #f87171; text-shadow: none; }
+
+    #results { display: flex; flex-direction: column; gap: 16px; }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-gold);
+      border-radius: 12px;
+      padding: 24px;
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      animation: slideUp 0.5s ease-out both;
+      position: relative;
+      overflow: hidden;
+      backdrop-filter: blur(10px);
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; width: 4px; height: 100%;
+      background: var(--gold);
+      opacity: 0.5;
+      transition: opacity 0.3s;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5), 0 0 20px rgba(212, 175, 55, 0.1);
+      border-color: var(--gold);
+    }
+    
+    .card:hover::before { opacity: 1; }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(20px); }
       to { opacity: 1; transform: translateY(0); }
     }
 
     .card-header {
       display: flex;
       justify-content: space-between;
-      align-items: baseline;
-      gap: 12px;
-      margin-bottom: 8px;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 12px;
+      border-bottom: 1px solid rgba(212, 175, 55, 0.15);
+      padding-bottom: 12px;
     }
 
     .card-title {
-      font-size: 17px;
+      font-family: 'Cinzel', serif;
+      font-size: 20px;
       font-weight: 700;
-      color: var(--accent);
+      color: var(--gold-light);
+      text-shadow: 0 2px 4px rgba(0,0,0,0.5);
     }
 
-    .card-meta {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-      flex-shrink: 0;
-    }
+    .card-meta { display: flex; gap: 10px; align-items: center; flex-shrink: 0; }
 
-    /* ── BADGES DOS TIPOS ── */
+    /* Badges redesenhados */
     .badge {
+      font-family: 'Cinzel', serif;
       font-size: 11px;
+      font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
-      padding: 3px 8px;
+      letter-spacing: 1px;
+      padding: 4px 10px;
       border-radius: 4px;
-      background: rgba(212, 175, 55, 0.12);
-      color: var(--accent);
-      border: 1px solid rgba(212, 175, 55, 0.3);
+      background: rgba(0,0,0,0.4);
+      border: 1px solid currentColor;
     }
-    .badge[data-tipo="personagem"] { background: rgba(212, 175, 55, 0.12); color: #d4af37; border-color: rgba(212, 175, 55, 0.3); }
-    .badge[data-tipo="local"]      { background: rgba(96, 165, 250, 0.12); color: #60a5fa; border-color: rgba(96, 165, 250, 0.3); }
-    .badge[data-tipo="item"]       { background: rgba(74, 222, 128, 0.12); color: #4ade80; border-color: rgba(74, 222, 128, 0.3); }
-    .badge[data-tipo="chefe"]      { background: rgba(248, 113, 113, 0.12); color: #f87171; border-color: rgba(248, 113, 113, 0.3); }
-    .badge[data-tipo="cancao"]     { background: rgba(192, 132, 252, 0.12); color: #c084fc; border-color: rgba(192, 132, 252, 0.3); }
-    .badge[data-tipo="raca"]       { background: rgba(34, 211, 238, 0.12); color: #22d3ee; border-color: rgba(34, 211, 238, 0.3); }
-    .badge[data-tipo="mini-chefe"] { background: rgba(251, 146, 60, 0.12); color: #fb923c; border-color: rgba(251, 146, 60, 0.3); }
-    .badge[data-tipo="inimigo"]    { background: rgba(156, 163, 175, 0.12); color: #9ca3af; border-color: rgba(156, 163, 175, 0.3); }
-    .badge[data-tipo="divindade"]  { background: rgba(250, 240, 180, 0.12); color: #faf0b4; border-color: rgba(250, 240, 180, 0.3); }
-    .badge[data-tipo="mecanica"]   { background: rgba(52, 211, 153, 0.12); color: #34d399; border-color: rgba(52, 211, 153, 0.3); }
+    .badge[data-tipo="personagem"] { color: #d4af37; }
+    .badge[data-tipo="local"]      { color: #60a5fa; }
+    .badge[data-tipo="item"]       { color: #4ade80; }
+    .badge[data-tipo="chefe"]      { color: #f87171; }
+    .badge[data-tipo="cancao"]     { color: #c084fc; }
+    .badge[data-tipo="raca"]       { color: #22d3ee; }
+    .badge[data-tipo="mini-chefe"] { color: #fb923c; }
+    .badge[data-tipo="inimigo"]    { color: #9ca3af; }
+    .badge[data-tipo="divindade"]  { color: #faf0b4; }
+    .badge[data-tipo="mecanica"]   { color: #34d399; }
 
     .score {
-      font-size: 12px;
-      color: var(--text-dim);
       font-family: monospace;
+      font-size: 12px;
+      color: var(--text-muted);
+      background: rgba(0,0,0,0.3);
+      padding: 4px 8px;
+      border-radius: 4px;
     }
 
     .card-text {
-      color: var(--text);
-      font-size: 14px;
-      line-height: 1.55;
-      opacity: 0.85;
-    }
-
-    /* ── CAIXA DOS COMANDOS DO N64 ── */
-    .comandos-box {
-      margin-top: 14px;
-      padding: 10px 14px;
-      background: rgba(212, 175, 55, 0.08);
-      border-left: 4px solid var(--accent);
-      border-radius: 4px;
-      font-family: monospace;
-      font-size: 14px;
-      color: var(--accent);
-      letter-spacing: 1px;
+      color: #b0c0d4;
+      font-size: 15px;
+      line-height: 1.6;
+      text-align: justify;
     }
 
     mark {
-      background: rgba(212, 175, 55, 0.35);
-      color: #fff;
-      padding: 0 2px;
+      background: rgba(212, 175, 55, 0.3);
+      color: var(--gold-light);
+      padding: 0 3px;
       border-radius: 2px;
+      font-weight: bold;
     }
 
+    /* ── COMANDOS DA OCARINA (N64) ── */
+    .comandos-box {
+      margin-top: 16px;
+      padding: 14px 18px;
+      background: linear-gradient(90deg, rgba(212, 175, 55, 0.1) 0%, rgba(212, 175, 55, 0.02) 100%);
+      border-left: 3px solid var(--gold);
+      border-radius: 4px 8px 8px 4px;
+      font-family: monospace;
+      font-size: 16px;
+      color: var(--gold-light);
+      letter-spacing: 2px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .comandos-box::before {
+      content: '🎵';
+      font-size: 20px;
+      filter: drop-shadow(0 0 5px var(--gold));
+    }
+
+    /* ── EMPTY STATE ── */
     .empty {
       text-align: center;
-      padding: 40px 20px;
-      color: var(--text-dim);
+      padding: 60px 20px;
+      background: var(--card-bg);
+      border: 1px dashed var(--border-gold);
+      border-radius: 12px;
+      font-family: 'Cinzel', serif;
+      color: var(--text-muted);
     }
+    .empty-icon { font-size: 50px; margin-bottom: 16px; opacity: 0.3; }
 
-    .empty-icon { font-size: 40px; margin-bottom: 12px; opacity: 0.5; }
-
+    /* ── FOOTER ── */
     footer {
-      margin-top: 50px;
+      margin-top: 60px;
+      font-family: 'Cinzel', serif;
       text-align: center;
-      color: var(--text-dim);
+      color: rgba(139, 155, 180, 0.5);
       font-size: 12px;
-      opacity: 0.6;
+      letter-spacing: 2px;
     }
 
     @media (max-width: 600px) {
-      body { padding: 24px 14px; }
-      h1 { font-size: 22px; }
+      h1 { font-size: 28px; }
       .search-box { flex-direction: column; }
-      #searchBtn { padding: 14px; }
+      #searchBtn { padding: 16px; }
+      .card-header { flex-direction: column; align-items: flex-start; }
+      .grass-corner { width: 200px; height: 150px; }
     }
   </style>
 </head>
 <body>
+
+  <!-- Decoração da Grama (SVG embutido no CSS) -->
+  <div class="grass-corner grass-left"></div>
+  <div class="grass-corner grass-right"></div>
+
   <div class="container">
     <header>
-      <div class="triforce">▲</div>
-      <h1>OCARINA OF TIME</h1>
-      <p class="subtitle">Busca Semântica Híbrida · Qdrant + BM25</p>
+      <!-- Triforce em CSS Puro -->
+      <div class="triforce-container">
+        <div class="tri-row">
+          <div class="tri"></div>
+          <div class="tri"></div>
+        </div>
+        <div class="tri-row">
+          <div class="tri"></div>
+        </div>
+      </div>
+      
+      <h1>Ocarina of Time</h1>
+      <p class="subtitle">Oráculo de Hyrule · Busca Híbrida</p>
     </header>
 
     <form class="search-box" id="searchForm">
       <input
         id="query"
         type="text"
-        placeholder="Quem viaja no tempo? Como tocar a Canção do Tempo?"
+        placeholder="Como tocar a Canção do Tempo? Onde fica a Espada Mestra?"
         autocomplete="off"
         autofocus
       />
@@ -293,16 +425,17 @@
       <span class="chip">Link</span>
       <span class="chip">Ganondorf</span>
       <span class="chip">Templo do Fogo</span>
-      <span class="chip">Canção do Tempo</span>
+      <span class="chip">Canção das Tempestades</span>
       <span class="chip">Espada Mestra</span>
-      <span class="chip">Chefes</span>
+      <span class="chip">Epona</span>
     </div>
 
     <div id="status"></div>
     <div id="results"></div>
 
     <footer>
-      Dados extraídos de The Legend of Zelda: Ocarina of Time · 196 registros
+      Dados extraídos de The Legend of Zelda: Ocarina of Time<br>
+      196 Fragmentos de Sabedoria Registrados
     </footer>
   </div>
 
@@ -313,7 +446,7 @@
     const status = document.getElementById("status");
     const results = document.getElementById("results");
 
-    // Preenche a busca ao clicar nas sugestões
+    // Ações dos chips de sugestão
     document.querySelectorAll(".chip").forEach(chip => {
       chip.addEventListener("click", () => {
         input.value = chip.textContent;
@@ -321,14 +454,14 @@
       });
     });
 
-    // Função para evitar HTML injection
+    // Prevenção de HTML Injection
     function escapeHtml(s) {
       return String(s)
         .replace(/&/g, "&amp;").replace(/</g, "&lt;")
         .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
     }
 
-    // Função para grifar as palavras pesquisadas no texto
+    // Grifar palavras no texto do resultado
     function highlight(text, query) {
       const words = query.trim().split(/\s+/)
         .filter(w => w.length > 2)
@@ -338,66 +471,64 @@
       return escapeHtml(text).replace(re, "<mark>$1</mark>");
     }
 
-    // Lógica do Submit da Busca
+    // Lógica de Busca
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
       const q = input.value.trim();
       
       if (q.length < 2) {
-        status.textContent = "Digite pelo menos 2 caracteres.";
+        status.textContent = "O Oráculo precisa de mais palavras...";
         status.className = "error";
         return;
       }
 
       btn.disabled = true;
-      status.textContent = "Consultando o Oráculo...";
-      status.className = "loading";
+      status.textContent = "Consultando os Sábios...";
+      status.className = "";
       results.innerHTML = "";
 
       try {
-        // Chama a API
         const r = await fetch(`/api/search?query=${encodeURIComponent(q)}&limit=20`);
         const data = await r.json();
 
         if (!r.ok || data.status !== "ok") {
-          throw new Error(data.message || "Erro na busca");
+          throw new Error(data.message || "Erro ao consultar o banco de dados.");
         }
 
         const total = data.total || 0;
         status.textContent = total === 0
-          ? "Nenhum resultado encontrado."
-          : `${total} resultado${total > 1 ? "s" : ""} encontrado${total > 1 ? "s" : ""}.`;
+          ? "Nenhum registro encontrado nos arquivos de Hyrule."
+          : `Foram encontrados ${total} registros nos arquivos.`;
         status.className = "";
 
         if (total === 0) {
           results.innerHTML = `
             <div class="empty">
-              <div class="empty-icon">◇</div>
-              <p>Tente reformular a pergunta.</p>
+              <div class="empty-icon">🛡️</div>
+              <p>Tente buscar por outro termo, herói.</p>
             </div>`;
           return;
         }
 
-        // Renderiza os Cards
+        // Renderização dos Cards
         results.innerHTML = data.results.map((r, i) => `
-          <article class="card" style="animation-delay: ${i * 40}ms">
+          <article class="card" style="animation-delay: ${i * 50}ms">
             <div class="card-header">
-              <div class="card-title">${escapeHtml(r.payload.titulo || "—")}</div>
+              <div class="card-title">${escapeHtml(r.payload.titulo || "Desconhecido")}</div>
               <div class="card-meta">
                 <span class="badge" data-tipo="${escapeHtml(r.payload.tipo || "")}">${escapeHtml(r.payload.tipo || "?")}</span>
-                <span class="score">${r.score.toFixed(4)}</span>
+                <span class="score" title="Pontuação RRF">${r.score.toFixed(4)}</span>
               </div>
             </div>
             <p class="card-text">${highlight(r.payload.text || "", q)}</p>
             
-            <!-- Exibe os comandos do N64 caso a canção tenha -->
-            ${r.payload.comandos ? `<div class="comandos-box">🎵 ${escapeHtml(r.payload.comandos)}</div>` : ""}
+            ${r.payload.comandos ? `<div class="comandos-box">N64: ${escapeHtml(r.payload.comandos.replace('N64: ', ''))}</div>` : ""}
             
           </article>
         `).join("");
         
       } catch (err) {
-        status.textContent = "Erro: " + err.message;
+        status.textContent = "As forças do mal bloquearam a busca: " + err.message;
         status.className = "error";
       } finally {
         btn.disabled = false;
