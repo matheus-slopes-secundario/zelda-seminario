@@ -19,17 +19,17 @@ module.exports = async (req, res) => {
 
   const baseUrl = QDRANT_URL.replace(/\/$/, "");
 
-  // Fórmula: (score_fundido) + (bônus se titulo == query)
+  // Fórmula: (score_fundido) + (bônus se o payload 'titulo' corresponder exatamente à query)
   // O bônus é 2.0, um valor forte o suficiente para subir o título exato ao topo.
   const formulaQuery = {
     "sum": [
       "$score",
       {
         "mult": [
-          2.0, // Força do bônus. Ajuste este valor se necessário.
+          2.0, // Força do bônus
           {
-            "key": "titulo",
-            "match": { "value": query } // Condição: titulo == query
+            "key": "titulo", // Campo de payload (NÃO é um vetor)
+            "match": { "value": query } // Condição de igualdade exata
           }
         ]
       }
@@ -40,17 +40,12 @@ module.exports = async (req, res) => {
     prefetch: [
       {
         query: { text: query, model: "qdrant/bm25" },
-        using: "titulo", // BM25 focado no título
-        limit: limit * 3
-      },
-      {
-        query: { text: query, model: "qdrant/bm25" },
-        using: "text", // BM25 no texto completo
+        using: "bm25", // Usa o vetor esparso BM25 padrão
         limit: limit * 3
       },
       {
         query: { text: query, model: "intfloat/multilingual-e5-small" },
-        using: "dense",
+        using: "dense", // Usa o vetor denso
         limit: limit * 3
       }
     ],
