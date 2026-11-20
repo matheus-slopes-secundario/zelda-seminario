@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ocarina of Time — Busca Semântica</title>
+  <style>
+    :root {
+      --bg: #0a0e1a;
+      --bg-card: #141a2e;
+      --bg-card-hover: #1a2138;
+      --accent: #d4af37;
+      --accent-dim: #8a7028;
+      --text: #e8e8f0;
+      --text-dim: #8b8fa8;
+      --border: #2a3050;
+      --success: #4ade80;
+      --error: #f87171;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
+      background-image: radial-gradient(ellipse at top, #1a2440 0%, transparent 60%);
+    }
+
+    .container { width: 100%; max-width: 860px; }
+
+    header {
+      text-align: center;
+      margin-bottom: 36px;
+    }
+
+    .triforce {
+      font-size: 42px;
+      margin-bottom: 8px;
+      filter: drop-shadow(0 0 20px rgba(212, 175, 55, 0.5));
+    }
+
+    h1 {
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      background: linear-gradient(135deg, var(--accent), #f5e28a, var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .subtitle {
+      color: var(--text-dim);
+      font-size: 14px;
+      margin-top: 6px;
+      letter-spacing: 0.5px;
+    }
+
+    .search-box {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    #query {
+      flex: 1;
+      padding: 16px 20px;
+      font-size: 16px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--bg-card);
+      color: var(--text);
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    #query:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15);
+    }
+
+    #query::placeholder { color: var(--text-dim); }
+
+    #searchBtn {
+      padding: 16px 28px;
+      font-size: 16px;
+      font-weight: 600;
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--accent), #b8942c);
+      color: #1a1200;
+      cursor: pointer;
+      transition: all 0.2s;
+      letter-spacing: 0.5px;
+    }
+
+    #searchBtn:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 20px rgba(212, 175, 55, 0.3);
+    }
+
+    #searchBtn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .suggestions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 30px;
+    }
+
+    .chip {
+      padding: 6px 14px;
+      border-radius: 999px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .chip:hover {
+      border-color: var(--accent-dim);
+      color: var(--accent);
+    }
+
+    #status {
+      text-align: center;
+      color: var(--text-dim);
+      font-size: 14px;
+      min-height: 20px;
+      margin-bottom: 20px;
+    }
+
+    #status.error { color: var(--error); }
+    #status.loading { color: var(--accent); }
+
+    #results {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px 20px;
+      transition: all 0.2s;
+      animation: fadeIn 0.3s ease-out both;
+    }
+
+    .card:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--accent-dim);
+      transform: translateY(-1px);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .card-title {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .card-meta {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .badge {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      background: rgba(212, 175, 55, 0.12);
+      color: var(--accent);
+      border: 1px solid rgba(212, 175, 55, 0.3);
+    }
+
+    .score {
+      font-size: 12px;
+      color: var(--text-dim);
+      font-family: monospace;
+    }
+
+    .card-text {
+      color: var(--text);
+      font-size: 14px;
+      line-height: 1.55;
+      opacity: 0.85;
+    }
+
+    mark {
+      background: rgba(212, 175, 55, 0.35);
+      color: #fff;
+      padding: 0 2px;
+      border-radius: 2px;
+    }
+
+    .empty {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--text-dim);
+    }
+
+    .empty-icon { font-size: 40px; margin-bottom: 12px; opacity: 0.5; }
+
+    footer {
+      margin-top: 50px;
+      text-align: center;
+      color: var(--text-dim);
+      font-size: 12px;
+      opacity: 0.6;
+    }
+
+    @media (max-width: 600px) {
+      body { padding: 24px 14px; }
+      h1 { font-size: 22px; }
+      .search-box { flex-direction: column; }
+      #searchBtn { padding: 14px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="triforce">▲</div>
+      <h1>OCARINA OF TIME</h1>
+      <p class="subtitle">Busca Semântica Híbrida · Qdrant + BM25</p>
+    </header>
+
+    <form class="search-box" id="searchForm">
+      <input
+        id="query"
+        type="text"
+        placeholder="Quem viaja no tempo? Onde fica o Templo do Fogo?"
+        autocomplete="off"
+        autofocus
+      />
+      <button type="submit" id="searchBtn">Buscar</button>
+    </form>
+
+    <div class="suggestions" id="suggestions">
+      <span class="chip">Ganondorf</span>
+      <span class="chip">Templo do Fogo</span>
+      <span class="chip">Ocarina do Tempo</span>
+      <span class="chip">Sábios</span>
+      <span class="chip">Epona</span>
+      <span class="chip">Chefes</span>
+    </div>
+
+    <div id="status"></div>
+    <div id="results"></div>
+
+    <footer>
+      Dados extraídos de The Legend of Zelda: Ocarina of Time · 43 registros
+    </footer>
+  </div>
+
+  <script>
+    const form = document.getElementById("searchForm");
+    const input = document.getElementById("query");
+    const btn = document.getElementById("searchBtn");
+    const status = document.getElementById("status");
+    const results = document.getElementById("results");
+
+    document.querySelectorAll(".chip").forEach(chip => {
+      chip.addEventListener("click", () => {
+        input.value = chip.textContent;
+        form.requestSubmit();
+      });
+    });
+
+    function escapeHtml(s) {
+      return String(s)
+        .replace(/&/g, "&amp;").replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    }
+
+    function highlight(text, query) {
+      const words = query.trim().split(/\s+/)
+        .filter(w => w.length > 2)
+        .map(w => w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+      if (!words.length) return escapeHtml(text);
+      const re = new RegExp(`(${words.join("|")})`, "gi");
+      return escapeHtml(text).replace(re, "<mark>$1</mark>");
+    }
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const q = input.value.trim();
+      if (q.length < 2) {
+        status.textContent = "Digite pelo menos 2 caracteres.";
+        status.className = "error";
+        return;
+      }
+
+      btn.disabled = true;
+      status.textContent = "Consultando o Oráculo...";
+      status.className = "loading";
+      results.innerHTML = "";
+
+      try {
+        const r = await fetch(`/api/search?query=${encodeURIComponent(q)}&limit=10`);
+        const data = await r.json();
+
+        if (!r.ok || data.status !== "ok") {
+          throw new Error(data.message || "Erro na busca");
+        }
+
+        const total = data.total || 0;
+        status.textContent = total === 0
+          ? "Nenhum resultado encontrado."
+          : `${total} resultado${total > 1 ? "s" : ""} encontrado${total > 1 ? "s" : ""}.`;
+        status.className = "";
+
+        if (total === 0) {
+          results.innerHTML = `
+            <div class="empty">
+              <div class="empty-icon">◇</div>
+              <p>Tente reformular a pergunta.</p>
+            </div>`;
+          return;
+        }
+
+        results.innerHTML = data.results.map((r, i) => `
+          <article class="card" style="animation-delay: ${i * 40}ms">
+            <div class="card-header">
+              <div class="card-title">${escapeHtml(r.payload.titulo || "—")}</div>
+              <div class="card-meta">
+                <span class="badge">${escapeHtml(r.payload.tipo || "?")}</span>
+                <span class="score">${r.score.toFixed(4)}</span>
+              </div>
+            </div>
+            <p class="card-text">${highlight(r.payload.text || "", q)}</p>
+          </article>
+        `).join("");
+      } catch (err) {
+        status.textContent = "Erro: " + err.message;
+        status.className = "error";
+      } finally {
+        btn.disabled = false;
+        input.focus();
+      }
+    });
+  </script>
+</body>
+</html>
