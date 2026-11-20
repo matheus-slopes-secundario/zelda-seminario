@@ -19,17 +19,17 @@ module.exports = async (req, res) => {
 
   const baseUrl = QDRANT_URL.replace(/\/$/, "");
 
-  // Fórmula: (score_fundido) + (bônus se o payload 'titulo' corresponder exatamente à query)
-  // O bônus é 2.0, um valor forte o suficiente para subir o título exato ao topo.
+  // Fórmula: (score RRF) + (5.0 se o título corresponder ao texto da query)
+  // O uso de "text" em vez de "value" torna a comparação case-insensitive.
   const formulaQuery = {
     "sum": [
       "$score",
       {
         "mult": [
-          2.0, // Força do bônus
+          5.0, // Boost forte para título exato
           {
-            "key": "titulo", // Campo de payload (NÃO é um vetor)
-            "match": { "value": query } // Condição de igualdade exata
+            "key": "titulo",
+            "match": { "text": query }
           }
         ]
       }
@@ -38,15 +38,28 @@ module.exports = async (req, res) => {
 
   const body = {
     prefetch: [
+      // 1) Prefetch BM25 normal (texto completo)
       {
         query: { text: query, model: "qdrant/bm25" },
-        using: "bm25", // Usa o vetor esparso BM25 padrão
-        limit: limit * 3
+        using: "bm25",
+        limit: 50
       },
+      // 2) Prefetch denso normal (semântica)
       {
         query: { text: query, model: "intfloat/multilingual-e5-small" },
-        using: "dense", // Usa o vetor denso
-        limit: limit * 3
+        using: "dense",
+        limit: 50
+      },
+      // 3) Prefetch FILTRADO: apenas pontos com título correspondente.
+      //    Isso garante que "Link" esteja entre os candidatos, mesmo que
+      //    as buscas BM25 e densa não o tragam para o topo.
+      {
+        filter: {
+          must: [
+            { key: "titulo", match: { text: query } }
+          ]
+        },
+        limit: 10
       }
     ],
     query: { formula: formulaQuery },
