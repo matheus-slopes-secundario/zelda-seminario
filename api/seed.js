@@ -215,43 +215,54 @@ module.exports = async (req, res) => {
   const col = process.env.QDRANT_COLLECTION;
 
   try {
-    // 🧹 PASSO 1: Apaga tudo que existe na coleção para garantir zero duplicatas
+    // 🧹 PASSO 1: Limpa o banco para não duplicar
     await fetch(`${baseUrl}/collections/${col}/points/delete?wait=true`, {
       method: "POST",
       headers,
       body: JSON.stringify({ filter: { must: [] } })
     });
 
-    // 🌱 PASSO 2: Insere os registros limpos, incluindo os comandos das canções
-    const points = ITEMS.map((item, i) => ({
-      id: crypto.randomUUID(),
-      vector: {
-        dense: { text: item.text, model: "intfloat/multilingual-e5-small" },
-        bm25:  { text: item.text, model: "qdrant/bm25" }
-      },
-      payload: { 
-        text: item.text, 
-        titulo: item.titulo, 
-        tipo: item.tipo, 
-        jogo: "Ocarina of Time",
-        comandos: item.comandos || null
+    // 🌱 PASSO 2: Insere em lotes de 25 itens para não sobrecarregar
+    const BATCH_SIZE = 25;
+    let inseridos = 0;
+
+    for (let i = 0; i < ITEMS.length; i += BATCH_SIZE) {
+      const batch = ITEMS.slice(i, i + BATCH_SIZE);
+      const points = batch.map((item) => ({
+        id: crypto.randomUUID(),
+        vector: {
+          dense: { text: item.text, model: "intfloat/multilingual-e5-small" },
+          bm25:  { text: item.text, model: "qdrant/bm25" }
+        },
+        payload: { 
+          text: item.text, 
+          titulo: item.titulo, 
+          tipo: item.tipo, 
+          jogo: "Ocarina of Time",
+          comandos: item.comandos || null
+        }
+      }));
+
+      const r = await fetch(`${baseUrl}/collections/${col}/points?wait=true`, {
+        method: "PUT",
+        headers,
+        body: JSON.stringify({ points })
+      });
+
+      if (!r.ok) {
+        const errorData = await r.json();
+        return res.status(500).json({ 
+          status: "error", 
+          message: `Qdrant recusou o lote ${Math.floor(i/BATCH_SIZE) + 1}`, 
+          details: errorData 
+        });
       }
-    }));
-
-    const r = await fetch(`${baseUrl}/collections/${col}/points?wait=true`, {
-      method: "PUT",
-      headers,
-      body: JSON.stringify({ points })
-    });
-
-    if (!r.ok) {
-      const errorData = await r.json();
-      return res.status(500).json({ status: "error", message: "Qdrant recusou", details: errorData });
+      inseridos += points.length;
     }
 
     return res.status(200).json({
       status: "ok",
-      message: `Sucesso! Banco limpo e ${points.length} registros únicos inseridos (incluindo comandos N64).`
+      message: `Sucesso! Banco limpo e ${inseridos} registros únicos inseridos (incluindo comandos N64).`
     });
   } catch (e) {
     return res.status(500).json({ error: e.message });
