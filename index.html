@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Ocarina of Time — Oráculo de Hyrule</title>
   
-  <!-- Fontes Temáticas -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Merriweather:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
@@ -38,89 +37,9 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 0 20px 120px; /* Espaço extra para a grama no fundo */
+      padding: 40px 20px 120px;
       position: relative;
       overflow-x: hidden;
-    }
-
-    /* ── CABEÇALHO COM A CAPA DO JOGO ── */
-    header {
-      width: 100%;
-      max-width: 900px;
-      height: 320px;
-      margin: 30px auto 20px;
-      border-radius: 16px;
-      background-image: 
-        linear-gradient(to bottom, rgba(6, 10, 18, 0.4) 0%, rgba(6, 10, 18, 0.9) 100%),
-        url('https://upload.wikimedia.org/wikipedia/en/5/57/The_Legend_of_Zelda_Ocarina_of_Time.jpg');
-      background-size: cover;
-      background-position: center 30%;
-      border: 1px solid var(--border-gold);
-      box-shadow: 0 10px 30px rgba(0,0,0,0.8), inset 0 0 50px rgba(0,0,0,0.6);
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-      align-items: center;
-      padding-bottom: 20px;
-      overflow: hidden;
-      animation: float 6s ease-in-out infinite;
-    }
-
-    @keyframes float {
-      0% { transform: translateY(0px); }
-      50% { transform: translateY(-5px); }
-      100% { transform: translateY(0px); }
-    }
-
-    /* Triforce em CSS Puro (sobreposta à capa) */
-    .triforce-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      margin-bottom: 10px;
-      filter: drop-shadow(0 0 15px var(--gold-glow));
-    }
-    .tri-row { display: flex; gap: 3px; }
-    .tri {
-      width: 0; height: 0;
-      border-left: 15px solid transparent;
-      border-right: 15px solid transparent;
-      border-bottom: 26px solid var(--gold);
-      position: relative;
-    }
-    .tri::after {
-      content: '';
-      position: absolute;
-      top: 5px; left: -12px;
-      width: 0; height: 0;
-      border-left: 12px solid transparent;
-      border-right: 12px solid transparent;
-      border-bottom: 21px solid var(--bg-deep);
-    }
-
-    h1 {
-      font-family: 'Cinzel', serif;
-      font-size: 32px;
-      font-weight: 800;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      background: linear-gradient(to bottom, var(--gold-light) 0%, var(--gold) 50%, #9e7b21 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      margin-bottom: 4px;
-      text-shadow: 0 4px 15px rgba(0,0,0,0.9);
-      text-align: center;
-    }
-
-    .subtitle {
-      font-family: 'Cinzel', serif;
-      color: var(--text-muted);
-      font-size: 13px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      text-shadow: 0 2px 4px rgba(0,0,0,0.8);
     }
 
     /* ── CONTAINER PRINCIPAL ── */
@@ -129,10 +48,50 @@
       max-width: 900px;
       position: relative;
       z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* ── LOGO OFICIAL (SEM FUNDO, SEM BORDAS) ── */
+    .logo-container {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      margin-bottom: 10px;
+      animation: float 6s ease-in-out infinite;
+    }
+
+    .logo-container img {
+      max-width: 100%;
+      height: auto;
+      max-height: 280px; /* Ajuste conforme necessário */
+      object-fit: contain;
+      filter: drop-shadow(0 10px 25px rgba(0,0,0,0.8));
+      /* Nenhuma borda, nenhum background, apenas a imagem transparente */
+    }
+
+    @keyframes float {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-5px); }
+      100% { transform: translateY(0px); }
+    }
+
+    /* ── SUBTÍTULO "PESQUISE SOBRE:" ── */
+    .search-label {
+      font-family: 'Cinzel', serif;
+      font-size: 16px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--gold-light);
+      margin-bottom: 12px;
+      text-shadow: 0 2px 5px rgba(0,0,0,0.8);
     }
 
     /* ── BARRA DE BUSCA ── */
     .search-box {
+      width: 100%;
+      max-width: 700px;
       display: flex;
       gap: 12px;
       margin-bottom: 20px;
@@ -235,7 +194,7 @@
 
     #status.error { color: #f87171; text-shadow: none; }
 
-    #results { display: flex; flex-direction: column; gap: 16px; }
+    #results { width: 100%; display: flex; flex-direction: column; gap: 16px; }
 
     .card {
       background: var(--card-bg);
@@ -337,7 +296,6 @@
       font-weight: bold;
     }
 
-    /* ── COMANDOS DA OCARINA (N64) ── */
     .comandos-box {
       margin-top: 16px;
       padding: 14px 18px;
@@ -359,7 +317,6 @@
       filter: drop-shadow(0 0 5px var(--gold));
     }
 
-    /* ── EMPTY STATE ── */
     .empty {
       text-align: center;
       padding: 60px 20px;
@@ -370,16 +327,6 @@
       color: var(--text-muted);
     }
     .empty-icon { font-size: 50px; margin-bottom: 16px; opacity: 0.3; }
-
-    /* ── FOOTER ── */
-    footer {
-      margin-top: 60px;
-      font-family: 'Cinzel', serif;
-      text-align: center;
-      color: rgba(139, 155, 180, 0.5);
-      font-size: 12px;
-      letter-spacing: 2px;
-    }
 
     /* ── GRAMA ANIMADA NA BASE DA TELA ── */
     .grass-field {
@@ -432,10 +379,8 @@
       100% { transform: rotate(8deg) skewX(3deg); }
     }
 
-    /* ── RESPONSIVIDADE ── */
     @media (max-width: 600px) {
-      header { height: 220px; }
-      h1 { font-size: 24px; }
+      .logo-container img { max-height: 180px; }
       .search-box { flex-direction: column; }
       #searchBtn { padding: 16px; }
       .card-header { flex-direction: column; align-items: flex-start; }
@@ -472,20 +417,16 @@
   </div>
 
   <div class="container">
-    <!-- Capa com a Arte do Jogo -->
-    <header>
-      <div class="triforce-container">
-        <div class="tri-row">
-          <div class="tri"></div>
-          <div class="tri"></div>
-        </div>
-        <div class="tri-row">
-          <div class="tri"></div>
-        </div>
-      </div>
-      <h1>Ocarina of Time</h1>
-      <p class="subtitle">Oráculo de Hyrule · Busca Híbrida</p>
-    </header>
+    <!-- Logo Oficial (PNG Transparente, Sem Bordas) -->
+    <div class="logo-container">
+      <img 
+        src="https://static.wikia.nocookie.net/zelda/images/6/6e/The_Legend_of_Zelda_Ocarina_of_Time.png" 
+        alt="The Legend of Zelda: Ocarina of Time" 
+      />
+    </div>
+
+    <!-- Subtítulo solicitado -->
+    <div class="search-label">Pesquise sobre:</div>
 
     <form class="search-box" id="searchForm">
       <input
@@ -509,11 +450,6 @@
 
     <div id="status"></div>
     <div id="results"></div>
-
-    <footer>
-      Dados extraídos de The Legend of Zelda: Ocarina of Time<br>
-      196 Fragmentos de Sabedoria Registrados
-    </footer>
   </div>
 
   <script>
@@ -523,7 +459,6 @@
     const status = document.getElementById("status");
     const results = document.getElementById("results");
 
-    // Ações dos chips de sugestão
     document.querySelectorAll(".chip").forEach(chip => {
       chip.addEventListener("click", () => {
         input.value = chip.textContent;
@@ -531,14 +466,12 @@
       });
     });
 
-    // Prevenção de HTML Injection
     function escapeHtml(s) {
       return String(s)
         .replace(/&/g, "&amp;").replace(/</g, "&lt;")
         .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
     }
 
-    // Grifar palavras no texto do resultado
     function highlight(text, query) {
       const words = query.trim().split(/\s+/)
         .filter(w => w.length > 2)
@@ -548,7 +481,6 @@
       return escapeHtml(text).replace(re, "<mark>$1</mark>");
     }
 
-    // Lógica de Busca
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
       const q = input.value.trim();
@@ -587,7 +519,6 @@
           return;
         }
 
-        // Renderização dos Cards
         results.innerHTML = data.results.map((r, i) => `
           <article class="card" style="animation-delay: ${i * 50}ms">
             <div class="card-header">
